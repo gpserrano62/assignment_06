@@ -204,9 +204,6 @@ def summarize_items(mentions: pd.DataFrame) -> pd.DataFrame:
             .reset_index(drop=True))[columns]
 
 
-# --- The Q&A box --------------------------------------------------------------------
-
-
 def question_scope(question: str, entity_document: dict, mentions: pd.DataFrame,
                    aliases: dict) -> dict:
     """What a question is about: its items, locations and subjects. *(Provided.)*
