@@ -5,3 +5,5 @@ terminology from this assignment (REST API, endpoint, HTTP status code,
 raise_for_status, API key, form data vs. JSON body, rate limit, caching,
 json_normalize, record_path, meta, grain, opinion mining, named-entity
 recognition, prompt, system prompt, reasoning model), and make it actionable.
+
+In completing this project I built a program that read coffee shop reviews and later showed what each person likes and disliked. The biggest thing I learned from this assignment was caching, specifically in the sentiment_step, entities_step, and subjects_step functions. By caching this data you only need to use the API key once to read the file and it saves the responses it finds in a different section. One of the hardest parts of this assignment was when I early on used ruff --fix. This deleted a function I hadnt worked on yet to make all the tests pass. I had to then use git to bring back the deleted code. 
