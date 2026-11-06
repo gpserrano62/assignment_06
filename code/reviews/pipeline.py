@@ -28,7 +28,6 @@ import os
 import pandas as pd
 
 from .apicalls import classify_mentions, get_entities, get_sentiment
-from .settings import MENTION_CATEGORIES
 
 
 def sentiment_step(reviews: pd.DataFrame, cache_file: str) -> list:
@@ -142,7 +141,6 @@ def opinions_table(documents: list) -> pd.DataFrame:
                 words = []
                 for relation in target["relations"]:
                     if relation["relationType"] == "assessment":
-                        # ref ends in the assessment's position, e.g. ".../assessments/2"
                         position = int(relation["ref"].split("/")[-1])
                         words.append(sentence["assessments"][position]["text"])
                 rows.append({
@@ -197,5 +195,27 @@ def subjects_step(reviews: pd.DataFrame, mentions: pd.DataFrame,
     cache when the request is exactly the same, so the same reviews must
     produce the same list every time.
     """
-    # TODO: your code here
-    pass
+    if os.path.exists(cache_file):
+        return pd.read_csv(cache_file)
+
+    rows = []
+    for review in reviews.to_dict("records"):
+        mine = mentions[mentions["review_id"] == review["review_id"]]
+        if mine.empty:
+            continue
+        names = (mine.sort_values("mention_offset", kind="stable")["mention"]
+                 .drop_duplicates().tolist())
+        response = classify_mentions(review["text"], names)
+        for name in names:
+            answer = response["answers"][name]
+            rows.append({
+                "review_id": review["review_id"],
+                "mention": name,
+                "subject": answer["choice"],
+                "subject_confidence": answer["confidence"],
+            })
+
+    subjects = pd.DataFrame(rows, columns=["review_id", "mention", "subject",
+                                           "subject_confidence"])
+    subjects.to_csv(cache_file, index=False)
+    return subjects
